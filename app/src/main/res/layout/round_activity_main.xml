@@ -1,10 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background_gradient"
-    tools:context=".MainActivity"
-    tools:deviceIds="wear_round">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:background="@drawable/background_gradient"
+tools:context=".MainActivity"
+tools:deviceIds="wear_round">
 
-</RelativeLayout>
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:text="Just do it!"
+    android:id="@+id/motivation_message"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/promote_text_background"
+    android:textColor="#ff072240"
+    android:typeface="monospace"
+    android:textAllCaps="true"
+    android:textSize="10dp"
+    android:layout_marginTop="25dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp" />
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceLarge"
+    android:text="25:00"
+    android:id="@+id/stopwatch"
+    android:layout_gravity="center_horizontal"
+    android:textColor="#ff86b3fb"
+    android:layout_marginTop="20dp"
+    android:textSize="45dp" />
+
+<ImageButton
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:scaleType="centerInside"
+    android:adjustViewBounds="true"
+    android:id="@+id/play_stop_btn"
+    android:onClick="start_stop_action"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/btn_play"
+    android:layout_marginTop="10dp" />
+
+</LinearLayout>

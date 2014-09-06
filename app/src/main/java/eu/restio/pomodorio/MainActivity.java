@@ -18,9 +18,8 @@ public class MainActivity extends Activity {
     private TextView motivation_message;
     private TextView stopwatch;
     private ImageButton start_stop_btn;
-
+    private CountDownTimer countDownTimer;
     private Boolean is_running = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +35,19 @@ public class MainActivity extends Activity {
                 Typeface ubuntumono = Typeface.createFromAsset(getAssets(),"fonts/ubuntumono.ttf");
                 stopwatch.setTypeface(face);
                 motivation_message.setTypeface(ubuntumono);
+                motivation_message.setText(Helper.get_random_motivation_message());
                 start_stop_btn = (ImageButton) findViewById(R.id.play_stop_btn);
+                countDownTimer = new CountDownTimer(60000 * 25, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                        long minutes = millisUntilFinished / 60000;
+                        long minutes_in_ms = minutes * 60000;
+                        stopwatch.setText((minutes) + ":" + ((millisUntilFinished - minutes_in_ms) / 1000));
+                    }
+
+                    public void onFinish() {
+                        set_notification_complete();
+                    }
+                };
             }
         });
     }
@@ -46,17 +57,7 @@ public class MainActivity extends Activity {
         if( !is_running ){
             // Should start
             is_running = true;
-            new CountDownTimer(60000*25, 1000) {
-                public void onTick(long millisUntilFinished) {
-                    long minutes = millisUntilFinished / 60000;
-                    long minutes_in_ms = minutes * 60000;
-                    stopwatch.setText((minutes) + ":" + ((millisUntilFinished - minutes_in_ms) / 1000));
-                }
-
-                public void onFinish() {
-                    set_notification_complete();
-                }
-            }.start();
+            countDownTimer.start();
             start_stop_btn.setImageResource(R.drawable.btn_stop);
         }else{
             is_running = false;
