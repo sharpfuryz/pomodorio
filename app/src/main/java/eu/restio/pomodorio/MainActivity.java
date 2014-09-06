@@ -1,7 +1,9 @@
 package eu.restio.pomodorio;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.wearable.view.WatchViewStub;
@@ -18,11 +20,6 @@ public class MainActivity extends Activity {
     private ImageButton start_stop_btn;
 
     private Boolean is_running = false;
-    private Handler customHandler = new Handler();
-    long timeInMilliseconds = 0L;
-    long timeSwapBuff = 0L;
-    long updatedTime = 0L;
-    long startTime = 0L;
 
 
     @Override
@@ -35,9 +32,11 @@ public class MainActivity extends Activity {
             public void onLayoutInflated(WatchViewStub stub) {
                 motivation_message = (TextView) findViewById(R.id.motivation_message);
                 stopwatch = (TextView) findViewById(R.id.stopwatch);
+                Typeface face = Typeface.createFromAsset(getAssets(),"fonts/aldrich.ttf");
+                Typeface ubuntumono = Typeface.createFromAsset(getAssets(),"fonts/ubuntumono.ttf");
+                stopwatch.setTypeface(face);
+                motivation_message.setTypeface(ubuntumono);
                 start_stop_btn = (ImageButton) findViewById(R.id.play_stop_btn);
-                Time t = Time.valueOf("25:00:00");
-                startTime = t.getTime();
             }
         });
     }
@@ -47,29 +46,29 @@ public class MainActivity extends Activity {
         if( !is_running ){
             // Should start
             is_running = true;
-            startTime = 0;
-            customHandler.postDelayed(updateTimerThread, 0);
+            new CountDownTimer(60000*25, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    long minutes = millisUntilFinished / 60000;
+                    long minutes_in_ms = minutes * 60000;
+                    stopwatch.setText((minutes) + ":" + ((millisUntilFinished - minutes_in_ms) / 1000));
+                }
 
-            // tweak button
+                public void onFinish() {
+                    set_notification_complete();
+                }
+            }.start();
+            start_stop_btn.setImageResource(R.drawable.btn_stop);
         }else{
+            is_running = false;
+            start_stop_btn.setImageResource(R.drawable.btn_play);
             // Should stop
         }
 
     }
 
-    // Timer code
-    private Runnable updateTimerThread = new Runnable() {
-        public void run() {
-//            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-            timeInMilliseconds = 1500000 - startTime;
-            updatedTime = timeSwapBuff + timeInMilliseconds;
-            int secs = (int) (updatedTime / 1000);
-            int mins = secs / 60;
-            secs = secs % 60;
-            int milliseconds = (int) (updatedTime % 1000);
-            stopwatch.setText(mins + ":" + String.format("%02d", secs));
-            customHandler.postDelayed(this, 0);
-        }
-    };
+    private void set_notification_complete() {
+        // TODO: Implement notificaiton onComplete
+    }
+
 
 }

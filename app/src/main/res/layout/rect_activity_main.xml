@@ -18,7 +18,7 @@
         android:background="@drawable/promote_text_background"
         android:textColor="#ff072240"
         android:typeface="monospace"
-        android:textScaleX="1.3"
+        android:textAllCaps="true"
         android:textSize="10dp"
         android:layout_marginTop="15dp"
         android:paddingLeft="10dp"
@@ -32,15 +32,15 @@
         android:text="25:00"
         android:id="@+id/stopwatch"
         android:layout_gravity="center_horizontal"
-        android:typeface="monospace"
         android:textColor="#ff86b3fb"
         android:layout_marginTop="20dp"
-        android:textScaleX="1.3"
         android:textSize="45dp" />
 
     <ImageButton
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
         android:id="@+id/play_stop_btn"
         android:onClick="start_stop_action"
         android:layout_gravity="center_horizontal"

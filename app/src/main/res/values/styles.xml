@@ -2,5 +2,9 @@
 <resources>
 
     <string name="promo_text_background_color">#2864b2</string>
+    <style name="aldrich_font">
+        <item name="android:fontFamily">aldrich</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 
 </resources>
