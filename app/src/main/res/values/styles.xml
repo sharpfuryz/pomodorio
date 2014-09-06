@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="background_color">Pomodorio</string>
+    <string name="promo_text_background_color">#2864b2</string>
 
 </resources>
