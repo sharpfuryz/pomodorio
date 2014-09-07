@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.Date;
+
 public class MainActivity extends Activity {
 
     // UI
@@ -22,6 +24,7 @@ public class MainActivity extends Activity {
     private TextView stopwatch;
     private TextView antitimer;
     private ImageButton start_stop_btn;
+    private static String default_time_active = "25:00";
     // Timer
     private CountDownTimer countDownTimer;
     private Boolean is_running = false;
@@ -41,21 +44,27 @@ public class MainActivity extends Activity {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
+                // UI
                 motivation_message = (TextView) findViewById(R.id.motivation_message);
                 stopwatch = (TextView) findViewById(R.id.stopwatch);
                 antitimer = (TextView) findViewById(R.id.antitimer);
+                // Fonts
                 Typeface face = Typeface.createFromAsset(getAssets(), "fonts/aldrich.ttf");
                 Typeface ubuntumono = Typeface.createFromAsset(getAssets(), "fonts/ubuntumono.ttf");
                 stopwatch.setTypeface(face);
+                stopwatch.setText(default_time_active);
                 antitimer.setTypeface(face);
                 motivation_message.setTypeface(ubuntumono);
                 motivation_message.setText(Helper.get_random_motivation_message());
+                // Buttons
                 start_stop_btn = (ImageButton) findViewById(R.id.play_stop_btn);
-
-                if( timer_val == 0 ){
-                    timer_val = timer_val_default;
-                }
-                initialize_timer(timer_val);
+                // Actual clock
+                Thread myThread = null;
+                Runnable myRunnableThread = new CountDownRunner();
+                myThread= new Thread(myRunnableThread);
+                myThread.start();
+                //
+                initialize_timer(timer_val_default);
             }
         });
     }
@@ -81,9 +90,9 @@ public class MainActivity extends Activity {
         long minutes = millisUntilFinished / 60000;
         long minutes_in_ms = minutes * 60000;
         long calc1 = ((millisUntilFinished - minutes_in_ms) / 1000);
-        long remain_seconds = ((remain_time - (remain_minutes * 60000))/ 1000 + 1);
+//        long remain_seconds = ((remain_time - (remain_minutes * 60000))/ 1000 + 1);
         stopwatch.setText((minutes) + ":" + calc1);
-        antitimer.setText((remain_minutes)+":"+remain_seconds);
+//        antitimer.setText((remain_minutes)+":"+remain_seconds);
     }
 
     public void start_stop_action(View view) {
@@ -92,18 +101,13 @@ public class MainActivity extends Activity {
         if( !is_running ){
             // Should start
             is_running = true;
-            if(timer_val ==  timer_val_default){
-                initialize_timer(timer_val);
-            }else {
-                timer_val = millis_from_timer;
-                initialize_timer(timer_val);
-            }
+            initialize_timer(timer_val_default);
             countDownTimer.start();
             start_stop_btn.setImageResource(R.drawable.btn_stop);
         }else{
             is_running = false;
             start_stop_btn.setImageResource(R.drawable.btn_play);
-            timer_val = millis_from_timer;
+            stopwatch.setText(default_time_active);
             countDownTimer.cancel();
             // Should stop
         }
@@ -112,26 +116,25 @@ public class MainActivity extends Activity {
 
     private void set_notification_complete() {
         vibrate();
-        // TODO: Remove code below
-        int notificationId = 001;
-        // Build intent for notification content
-        Intent viewIntent = new Intent(this, MainActivity.class);
-
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(this)
-                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.background_gradient))
-                        .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
-                        .setContentTitle("Relax 5 minutes")
-                        .setPriority(1)
-                        .setVibrate(new long[300])
-                        .setContentText(Helper.get_random_relax_message());
-
-        // Get an instance of the NotificationManager service
-        NotificationManagerCompat notificationManager =
-                NotificationManagerCompat.from(this);
-
-        // Build the notification and issues it with notification manager.
-        notificationManager.notify(notificationId, notificationBuilder.build());
+//        int notificationId = 001;
+//        // Build intent for notification content
+//        Intent viewIntent = new Intent(this, MainActivity.class);
+//
+//        NotificationCompat.Builder notificationBuilder =
+//                new NotificationCompat.Builder(this)
+//                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+//                        .setSmallIcon(R.drawable.ic_launcher)
+//                        .setContentTitle("Relax 5 minutes")
+//                        .setPriority(1)
+//                        .setVibrate(new long[300])
+//                        .setContentText(Helper.get_random_relax_message());
+//
+//        // Get an instance of the NotificationManager service
+//        NotificationManagerCompat notificationManager =
+//                NotificationManagerCompat.from(this);
+//
+//        // Build the notification and issues it with notification manager.
+//        notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
     private void vibrate(){
@@ -140,4 +143,35 @@ public class MainActivity extends Activity {
         vibrator.vibrate(pattern, 0);
     }
 
+    //
+    // Anti-pattern
+    public void doWork() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                try{
+                    Date dt = new Date();
+                    int hours = dt.getHours();
+                    int minutes = dt.getMinutes();
+                    String curTime = hours + ":" + minutes;
+                    antitimer.setText(curTime);
+                }catch (Exception e) {}
+            }
+        });
+    }
+
+
+    class CountDownRunner implements Runnable{
+        // @Override
+        public void run() {
+            while(!Thread.currentThread().isInterrupted()){
+                try {
+                    doWork();
+                    Thread.sleep(1000); // Pause of 1 Second
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }catch(Exception e){
+                }
+            }
+        }
+    }
 }
