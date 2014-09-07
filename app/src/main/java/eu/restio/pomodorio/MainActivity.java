@@ -29,7 +29,9 @@ public class MainActivity extends Activity {
     private ImageButton start_stop_btn;
     private CountDownTimer countDownTimer;
     private Boolean is_running = false;
-    private long timer_val = (60000 * 25);
+    private long timer_val = 0;
+    private static long timer_val_default = (60000*25);
+    private long millis_from_timer = 0;
     public static final int NOTIFICATION_ID = 1;
 
     @Override
@@ -37,7 +39,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        set_notification_complete();
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
@@ -52,22 +53,29 @@ public class MainActivity extends Activity {
                 motivation_message.setText(Helper.get_random_motivation_message());
                 start_stop_btn = (ImageButton) findViewById(R.id.play_stop_btn);
 
-                // TODO: Rewrite me!
-                countDownTimer = new CountDownTimer(timer_val, 1000) {
-                    public void onTick(long millisUntilFinished) {
-                        clock_tick(millisUntilFinished);
-                    }
-
-                    public void onFinish() {
-                        set_notification_complete();
-                    }
-                };
+                if( timer_val == 0 ){
+                    timer_val = timer_val_default;
+                }
+                start_timer(timer_val);
             }
         });
     }
 
+    private void start_timer(long defined_val) {
+    // Actualy it recreates timer, but not starts it
+        countDownTimer = new CountDownTimer(defined_val, 1000) {
+            public void onTick(long millisUntilFinished) {
+                clock_tick(millisUntilFinished);
+            }
+            public void onFinish() {
+                set_notification_complete();
+            }
+        };
+    }
+
     private void clock_tick(long millisUntilFinished) {
         // UI Implementation of Timer.tick()
+        millis_from_timer = millisUntilFinished;
         long remain_time = timer_val - millisUntilFinished;
         long remain_minutes = remain_time / 60000;
         long minutes = millisUntilFinished / 60000;
@@ -82,11 +90,18 @@ public class MainActivity extends Activity {
         if( !is_running ){
             // Should start
             is_running = true;
+            if(timer_val ==  timer_val_default){
+                start_timer(timer_val); // << OSHIBKA!
+            }else {
+                start_timer(millis_from_timer);
+            }
             countDownTimer.start();
             start_stop_btn.setImageResource(R.drawable.btn_stop);
         }else{
             is_running = false;
             start_stop_btn.setImageResource(R.drawable.btn_play);
+            timer_val = millis_from_timer;
+            countDownTimer.cancel();
             // Should stop
         }
 
