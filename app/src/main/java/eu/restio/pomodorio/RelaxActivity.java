@@ -3,13 +3,10 @@ package eu.restio.pomodorio;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.wearable.view.WatchViewStub;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,29 +14,26 @@ import android.widget.TextView;
 
 import java.util.Date;
 
-public class MainActivity extends Activity {
-
+public class RelaxActivity extends Activity {
     // UI
     private TextView motivation_message;
     private TextView stopwatch;
     private TextView antitimer;
     private ImageButton start_stop_btn;
-    private static String default_time_active = "25:00";
+    private static String default_time_active = "5:00";
     // Timer
     private CountDownTimer countDownTimer;
     private Boolean is_running = false;
     private long timer_val = 0;
-    private static long timer_val_default = (60000*1); // FIXME
     private static long timer_val_relax = (60000*5);
     private long timer_started_with = 0;
     private long millis_from_timer = 0;
     // Stuff
     public static final int NOTIFICATION_ID = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_relax);
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
@@ -55,7 +49,7 @@ public class MainActivity extends Activity {
                 stopwatch.setText(default_time_active);
                 antitimer.setTypeface(face);
                 motivation_message.setTypeface(ubuntumono);
-                motivation_message.setText(Helper.get_random_motivation_message());
+                motivation_message.setText(Helper.get_random_relax_message());
                 // Buttons
                 start_stop_btn = (ImageButton) findViewById(R.id.play_stop_btn);
                 // Actual clock
@@ -64,13 +58,14 @@ public class MainActivity extends Activity {
                 myThread= new Thread(myRunnableThread);
                 myThread.start();
                 //
-                initialize_timer(timer_val_default);
+                initialize_timer(timer_val_relax);
             }
         });
     }
-
+    
+    // GOVNO LILOS PO TRUBAM V REPOZITAII
     private void initialize_timer(long defined_val) {
-    // Actualy it recreates timer, but not starts it
+        // Actualy it recreates timer, but not starts it
         timer_started_with = defined_val;
         countDownTimer = new CountDownTimer(defined_val, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -101,14 +96,13 @@ public class MainActivity extends Activity {
         }
     }
 
-
     public void start_stop_action(View view) {
-        motivation_message.setText(Helper.get_random_motivation_message());
+        motivation_message.setText(Helper.get_random_relax_message());
 
         if( !is_running ){
             // Should start
             is_running = true;
-            initialize_timer(timer_val_default);
+            initialize_timer(timer_val_relax);
             countDownTimer.start();
             start_stop_btn.setImageResource(R.drawable.btn_stop);
         }else{
@@ -123,7 +117,7 @@ public class MainActivity extends Activity {
 
     private void set_notification_complete() {
         vibrate();
-        Intent i = new Intent(this, RelaxActivity.class);
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
 
