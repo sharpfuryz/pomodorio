@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
     private CountDownTimer countDownTimer;
     private Boolean is_running = false;
     private long timer_val = 0;
-    private static long timer_val_default = (60000*1); // FIXME
+    private static long timer_val_default = (60000*25); // << CHANGE AMOUNT OF TIME HERE
     private static long timer_val_relax = (60000*5);
     private long timer_started_with = 0;
     private long millis_from_timer = 0;
