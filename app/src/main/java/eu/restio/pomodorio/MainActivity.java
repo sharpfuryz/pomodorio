@@ -1,15 +1,13 @@
 package eu.restio.pomodorio;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.wearable.view.WatchViewStub;
@@ -17,21 +15,22 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.sql.Time;
-
 public class MainActivity extends Activity {
 
+    // UI
     private TextView motivation_message;
     private TextView stopwatch;
     private TextView antitimer;
     private ImageButton start_stop_btn;
+    // Timer
     private CountDownTimer countDownTimer;
     private Boolean is_running = false;
     private long timer_val = 0;
     private static long timer_val_default = (60000*25);
+    private static long timer_val_relax = (60000*5);
+    private long timer_started_with = 0;
     private long millis_from_timer = 0;
+    // Stuff
     public static final int NOTIFICATION_ID = 1;
 
     @Override
@@ -56,13 +55,14 @@ public class MainActivity extends Activity {
                 if( timer_val == 0 ){
                     timer_val = timer_val_default;
                 }
-                start_timer(timer_val);
+                initialize_timer(timer_val);
             }
         });
     }
 
-    private void start_timer(long defined_val) {
+    private void initialize_timer(long defined_val) {
     // Actualy it recreates timer, but not starts it
+        timer_started_with = defined_val;
         countDownTimer = new CountDownTimer(defined_val, 1000) {
             public void onTick(long millisUntilFinished) {
                 clock_tick(millisUntilFinished);
@@ -76,24 +76,27 @@ public class MainActivity extends Activity {
     private void clock_tick(long millisUntilFinished) {
         // UI Implementation of Timer.tick()
         millis_from_timer = millisUntilFinished;
-        long remain_time = timer_val - millisUntilFinished;
+        long remain_time = timer_started_with - millisUntilFinished;
         long remain_minutes = remain_time / 60000;
         long minutes = millisUntilFinished / 60000;
         long minutes_in_ms = minutes * 60000;
         long calc1 = ((millisUntilFinished - minutes_in_ms) / 1000);
+        long remain_seconds = ((remain_time - (remain_minutes * 60000))/ 1000 + 1);
         stopwatch.setText((minutes) + ":" + calc1);
-        antitimer.setText((remain_minutes)+":"+((remain_time - (remain_minutes * 60000))/ 1000));
+        antitimer.setText((remain_minutes)+":"+remain_seconds);
     }
 
     public void start_stop_action(View view) {
-        // Should toggle image on button, start or stop timer
+        motivation_message.setText(Helper.get_random_motivation_message());
+
         if( !is_running ){
             // Should start
             is_running = true;
             if(timer_val ==  timer_val_default){
-                start_timer(timer_val); // << OSHIBKA!
+                initialize_timer(timer_val);
             }else {
-                start_timer(millis_from_timer);
+                timer_val = millis_from_timer;
+                initialize_timer(timer_val);
             }
             countDownTimer.start();
             start_stop_btn.setImageResource(R.drawable.btn_stop);
@@ -108,6 +111,8 @@ public class MainActivity extends Activity {
     }
 
     private void set_notification_complete() {
+        vibrate();
+        // TODO: Remove code below
         int notificationId = 001;
         // Build intent for notification content
         Intent viewIntent = new Intent(this, MainActivity.class);
@@ -129,5 +134,10 @@ public class MainActivity extends Activity {
         notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
+    private void vibrate(){
+        long pattern[]={0,200,100,300,400};
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(pattern, 0);
+    }
 
 }

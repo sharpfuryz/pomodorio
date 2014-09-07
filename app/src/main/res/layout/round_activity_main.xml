@@ -56,5 +56,4 @@ tools:deviceIds="wear_round">
         android:layout_gravity="center_horizontal"
         android:background="@drawable/btn_play"
         android:layout_marginTop="5dp" />
-
 </LinearLayout>
