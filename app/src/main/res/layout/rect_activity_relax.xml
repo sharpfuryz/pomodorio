@@ -56,7 +56,4 @@ tools:deviceIds="wear_square">
     android:layout_gravity="center_horizontal"
     android:background="@drawable/btn_play"
     android:layout_marginTop="5dp" />
-<de.passsy.holocircularprogressbar.HoloCircularProgressBar
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
 </LinearLayout>
